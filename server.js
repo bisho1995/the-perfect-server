@@ -41,7 +41,8 @@ app.all("*", (req, res) => {
   });
   const hbsData = { nonce: req.nonce };
 
-  res.status(200).send(template(hbsData));
+//   res.status(200).send(template(hbsData));
+    res.render("index", hbsData)
 });
 
 const port = 3080;
