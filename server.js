@@ -5,6 +5,8 @@ const express = require("express");
 const exphbs = require("express-handlebars");
 const compression = require("compression");
 const helmetCsp = require("helmet-csp");
+const handlebars = require("handlebars");
+const fs = require("fs");
 const { csp } = require("./csp");
 
 const app = express();
@@ -25,6 +27,10 @@ const addNonce = (req, _, next) => {
 
 app.use([compression(), addNonce, helmetCsp(csp)]);
 
+const template = handlebars.compile(
+  fs.readFileSync("./templates/index.hbs", { encoding: "utf-8" })
+);
+
 app.all("*", (req, res) => {
   res.header("Content-type", "text/html");
   res.header({
@@ -33,8 +39,9 @@ app.all("*", (req, res) => {
     Pragma: "no-cache",
     "Last-Modified": Date.now(),
   });
+  const hbsData = { nonce: req.nonce };
 
-  res.render("index", { nonce: req.nonce });
+  res.status(200).send(template(hbsData));
 });
 
 const port = 3080;
