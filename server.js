@@ -5,6 +5,7 @@ const express = require("express");
 const exphbs = require("express-handlebars");
 const compression = require("compression");
 const helmetCsp = require("helmet-csp");
+const { csp } = require("./csp");
 
 const app = express();
 
@@ -22,25 +23,17 @@ const addNonce = (req, _, next) => {
   next();
 };
 
-const csp = {
-  directives: {
-    "default-src": ["'self'"],
-    "script-src": [
-      "'self'",
-      (req) => (req.nonce ? `'nonce-${req.nonce}'` : ""),
-    ],
-    "style-src": ["'self'", (req) => (req.nonce ? `'nonce-${req.nonce}'` : "")],
-    "img-src": ["'self'"],
-    "font-src": ["'self'"],
-    "frame-src": ["'self'"],
-    "child-src": ["'self'"],
-    "worker-src": ["'self'"],
-  },
-};
-
 app.use([compression(), addNonce, helmetCsp(csp)]);
 
 app.all("*", (req, res) => {
+  res.header("Content-type", "text/html");
+  res.header({
+    "Cache-Control": "private, no-cache, no-store, must-revalidate, max-age=0",
+    Expires: "Thu, 01 Jan 1970 00:00:00 GMT",
+    Pragma: "no-cache",
+    "Last-Modified": Date.now(),
+  });
+
   res.render("index", { nonce: req.nonce });
 });
 
