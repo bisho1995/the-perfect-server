@@ -32,6 +32,8 @@ const template = handlebars.compile(
 );
 
 app.all("*", (req, res) => {
+  console.log(new Date(), "got a hit");
+
   res.header("Content-type", "text/html");
   res.header({
     "Cache-Control": "private, no-cache, no-store, must-revalidate, max-age=0",
@@ -41,8 +43,8 @@ app.all("*", (req, res) => {
   });
   const hbsData = { nonce: req.nonce };
 
-//   res.status(200).send(template(hbsData));
-    res.render("index", hbsData)
+  //   res.status(200).send(template(hbsData));
+  res.render("index", hbsData);
 });
 
 const port = 3080;
